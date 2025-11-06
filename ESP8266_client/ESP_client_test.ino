@@ -33,12 +33,14 @@ void loop() {
   Serial.print(host);
   Serial.print(":");
   Serial.println(port);
-  // Use WiFiClient class to create TCP connections
+  //Use WiFiClient class to create TCP connections
   WiFiClient client;
+
   if (!client.connect(host, port)) {
     Serial.println("connection failed");
   return;
   }
+
   while(true){
   // This will send the request to the server
   sprintf(send_buf,"%d",++seq);
