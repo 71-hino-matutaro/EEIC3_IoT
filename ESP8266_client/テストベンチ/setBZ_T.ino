@@ -5,6 +5,6 @@ void setup(){
 }
 
 void loop(){
-    setBZ(True);
+    setBZ(true);
     while(1);
 }
