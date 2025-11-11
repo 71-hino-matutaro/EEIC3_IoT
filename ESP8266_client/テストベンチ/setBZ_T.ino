@@ -8,3 +8,8 @@ void loop(){
     setBZ(true);
     while(1);
 }
+
+//以下関数の定義
+void setBZ(boolean on){
+    digitalWrite(14, on? HIGH:LOW);
+}
