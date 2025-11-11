@@ -1,3 +1,3 @@
 boolean getPushSWStatus(){
-    return degitalRead(2);
+    return !digitalRead(2);
 }
