@@ -77,6 +77,9 @@ void loop(){
 
   unsigned long time = getNTPTime(ntp_server);
   display.println(formatUnixTime(time));
+  display.println(getDIPSStatus());
+  display.println(getIlluminance());
+  display.println(getMDSStatus());
   display.display();//固定
   delay(30000);
 }
@@ -84,6 +87,35 @@ void loop(){
 
 
 //以下関数の定義
+//人を感知するセンサ関数
+boolean getMDSStatus(){
+    return digitalRead(16);  
+}
+
+//照度を返す関数
+float getIlluminance(){
+    int t = analogRead(A0);
+    float v = t/320.0; //抵抗電圧を求める
+    float i = v/0.997; //mA単位にする 並列抵抗は0.997Ω
+    float logi = log10(i);
+    float k = ((4+log10(2.0))/(4+log10(5.0/3.0)));//傾き
+    return pow(10,k*(logi+4-log10(3))-1);
+}
+
+//DIPスイッチの値を返す関数
+int getDIPSStatus(){
+    int stat=0;
+    int bit1=digitalRead(12);
+    int bit0=digitalRead(13);
+    if(bit0==LOW){
+        stat|=0x01;
+    }
+    if(bit1==LOW){
+        stat|=0x02;
+    }
+    return(stat);
+}
+
 //NTPtimeを取得する関数
 unsigned long getNTPTime(const char* ntp_server){
 unsigned long unix_time=0UL;
@@ -115,7 +147,7 @@ break;
 return unix_time;    
 }
 
-//UNIX時刻をISO8601形式の文字列に変換
+//UNIX時刻をISO8601形式の文字列に変換する関数
 String formatUnixTime(unsigned long unix_time) {
 
   // 1970/1/1からの日数と、月ごとの日数を計算するための定数
