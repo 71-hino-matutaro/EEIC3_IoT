@@ -62,7 +62,7 @@ void setup() {
   unsigned long start_time = 0UL; // 起動時にNTPから取得した基準時刻を格納
   udp.begin(8888);
   start_time = getNTPTime(ntp_server);
-  udp.stop();
+  //udp.stop();
   display.clearDisplay();
   display.println(formatUnixTime(start_time));
   display.display();
@@ -70,12 +70,15 @@ void setup() {
 }
 
 void loop(){
+  //固定
   display.clearDisplay();
   display.setCursor(0,0);
   display.setTextColor(SSD1306_WHITE);
-  display.println(1);
-  delay(3000);
-  display.display();
+
+  unsigned long time = getNTPTime(ntp_server);
+  display.println(formatUnixTime(time));
+  display.display();//固定
+  delay(30000);
 }
 
 
