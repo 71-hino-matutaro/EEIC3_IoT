@@ -77,11 +77,15 @@ void loop(){
 
   //4.1 ID,時刻,照度,人感センサを取得→ディスプレイに表示
   unsigned long time = getNTPTime(ntp_server);
-  display.println(formatUnixTime(time));
-  display.println(getDIPSStatus());
-  display.println(getIlluminance());
-  display.println(getMDSStatus());
-  display.display();
+  String t;
+  display.println(t=formatUnixTime(time));
+  int d;
+  display.println(d=getDIPSStatus());
+  float i;
+  display.println(i=getIlluminance());
+  boolean m;
+  display.println(m=getMDSStatus());
+  display.display(t,d,i,m);
   delay(3000);//3秒は表示
 
   //サーバに接続
@@ -107,6 +111,30 @@ void loop(){
 
 
 //以下関数の定義
+
+//サーバーにデータを送る関数
+void sendData(String a,int b,float c,boolean d){
+  //HTTPクライアントオブジェクトを宣言
+  HTTPClient http;
+  //1.urlを構築
+  //例：String dataUrl = String(serverUrl) + 
+                   "?temperature=" + String(currentTemp, 1) + // 小数点以下1桁まで
+                   "&humidity=" + String(currentHumid, 1) + 
+                   "&device_id=ESP-001";
+  String dataUrl = String(serverurl)+"?time="+String(a)+"&ID="+String(b)+"&lux="+String(c)+"&sense="+String(d);
+
+  //2.HTTPリクエストを開始
+  http.begin(dataUrl);
+
+  //3.getメッセージでリクエストを送信
+  int httpCode = http.GET();
+  if (httpCode > 0) {
+    // 成功コード (例: 200 OK) が返された場合
+    Serial.printf("[HTTP] GET... code: %d\n", httpCode);
+  }
+  http.end();
+}
+
 //人を感知するセンサ関数
 boolean getMDSStatus(){
     return digitalRead(16);  
