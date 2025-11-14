@@ -75,13 +75,33 @@ void loop(){
   display.setCursor(0,0);
   display.setTextColor(SSD1306_WHITE);
 
+  //4.1 ID,時刻,照度,人感センサを取得→ディスプレイに表示
   unsigned long time = getNTPTime(ntp_server);
   display.println(formatUnixTime(time));
   display.println(getDIPSStatus());
   display.println(getIlluminance());
   display.println(getMDSStatus());
-  display.display();//固定
-  delay(30000);
+  display.display();
+  delay(3000);//3秒は表示
+
+  //サーバに接続
+  WiFiClient client;
+  if(!client.connect(host,port)){
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.setTextColor(SSD1306_WHITE);
+    display.println("connection failed.");
+    display.display();
+  }
+  else{
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.setTextColor(SSD1306_WHITE);
+    display.println("connection success.");
+    client.stop();
+    display.display();
+  }
+  delay(27000);
 }
 
 
