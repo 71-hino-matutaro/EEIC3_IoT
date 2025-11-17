@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <HTTPClient.h> 
+#include <ESP8266HTTPClient.h> 
 const char* ssid = "ist_members"; //大学のwifi
 const char* password = "8gAp3nY!s2Gm";
 //const char* ssid = "pr500m-993bc7-1"; //自宅作業用
@@ -122,10 +122,10 @@ void sendData(String a,int b,float c,boolean d){
   //HTTPクライアントオブジェクトを宣言
   HTTPClient http;
   //1.urlを構築
-  String dataUrl = String(host)+ENDPOINT_PATH"?time="+String(a)+"&ID="+String(b)+"&lux="+String(c)+"&sense="+String(d);
+  String dataUrl = String(host)+ENDPOINT_PATH+"?time="+String(a)+"&ID="+String(b)+"&lux="+String(c)+"&sense="+String(d);
 
   //2.HTTPリクエストを開始
-  http.begin(dataUrl);
+  http.begin(client,dataUrl);
 
   //3.getメッセージでリクエストを送信
   int httpCode = http.GET();
