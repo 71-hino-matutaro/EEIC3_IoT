@@ -4,9 +4,13 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-const char* ssid = "pr500m-993bc7-1";
-const char* password = "771326f70b313";
+#include <HTTPClient.h> 
+const char* ssid = "ist_members"; //大学のwifi
+const char* password = "8gAp3nY!s2Gm";
+//const char* ssid = "pr500m-993bc7-1"; //自宅作業用
+//const char* password = "771326f70b313";
 const char* host = "iot.hongo.wide.ad.jp";
+const String ENDPOINT_PATH = "/receive_data";
 const int port = 10145; // ** 割り当てられたものを使用せよ**
 const char* ntp_server = "ntp.nict.jp";
 WiFiUDP udp; 
@@ -85,7 +89,7 @@ void loop(){
   display.println(i=getIlluminance());
   boolean m;
   display.println(m=getMDSStatus());
-  display.display(t,d,i,m);
+  display.display();
   delay(3000);//3秒は表示
 
   //サーバに接続
@@ -104,6 +108,7 @@ void loop(){
     display.println("connection success.");
     client.stop();
     display.display();
+    sendData(t,d,i,m);
   }
   delay(27000);
 }
@@ -117,11 +122,7 @@ void sendData(String a,int b,float c,boolean d){
   //HTTPクライアントオブジェクトを宣言
   HTTPClient http;
   //1.urlを構築
-  //例：String dataUrl = String(serverUrl) + 
-                   "?temperature=" + String(currentTemp, 1) + // 小数点以下1桁まで
-                   "&humidity=" + String(currentHumid, 1) + 
-                   "&device_id=ESP-001";
-  String dataUrl = String(serverurl)+"?time="+String(a)+"&ID="+String(b)+"&lux="+String(c)+"&sense="+String(d);
+  String dataUrl = String(host)+ENDPOINT_PATH"?time="+String(a)+"&ID="+String(b)+"&lux="+String(c)+"&sense="+String(d);
 
   //2.HTTPリクエストを開始
   http.begin(dataUrl);
