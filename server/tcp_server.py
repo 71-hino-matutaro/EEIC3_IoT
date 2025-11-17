@@ -15,7 +15,7 @@ server.bind((bind_ip,bind_port))
 server.listen(5)
 print(f"[*] listen {bind_ip}:{bind_port}")
 
-#
+
 def handle_client(client_socket):
     bufsize=1024
     while True:
