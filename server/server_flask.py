@@ -23,7 +23,7 @@ logger.setLevel(logging.INFO) # Flaskがアクセスログを出力するよう�
 # Flaskアプリケーションのインスタンスを作成
 app = Flask(__name__)
 
-@app.route('/', methods=['GET'])
+@app.route('/receive_data', methods=['GET'])
 def receive_data():
     """
     ルートパス('/')へのGETリクエストを処理する関数。
