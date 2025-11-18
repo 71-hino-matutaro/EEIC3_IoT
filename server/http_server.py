@@ -12,7 +12,7 @@ SERVER_PORT = int(sys.argv[1])
 
 #csvファイル名の設定
 t = datetime.datetime.now()
-CSV_FILE = "data.csv"
+CSV_FILE = f"{t} {sys.argv[1]} data.csv"
 
 class SimpleDataHandler(BaseHTTPRequestHandler):
     """
