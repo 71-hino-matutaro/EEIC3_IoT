@@ -37,7 +37,7 @@ class SimpleDataHandler(BaseHTTPRequestHandler):
         try: #try...except...でエラーが起きた時の対策
             # クライアントコードで送られているキー名に合わせる
             time_value = query_params_list.get('time', ['N/A'])[0]
-            id_value = query_params_list.get('ID', ['N/A'])[0] # 大文字'ID'
+            id_value = query_params_list.get('ID', ['N/A'])[0]
             lux_value = query_params_list.get('lux', ['N/A'])[0]
             sense_value = query_params_list.get('sense', ['N/A'])[0]
             
