@@ -3,11 +3,12 @@ import csv
 import os
 import datetime
 import logging
+import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse,parse_qs
 
 HOST_NAME = '0.0.0.0'
-SERVER_PORT = 10145
+SERVER_PORT = int(sys.argv) 
 
 #csvファイル名の設定
 t = datetime.datetime.now()
