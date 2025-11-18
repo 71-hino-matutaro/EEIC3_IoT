@@ -2,6 +2,7 @@ import json
 import csv
 import os
 import datetime
+import logging
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse,parse_qs
 
@@ -10,8 +11,7 @@ SERVER_PORT = 10145
 
 #csvファイル名の設定
 t = datetime.datetime.now()
-CSV_NAME = "data" + t
-CSV_FILE = CSV_NAME.csv
+CSV_FILE = "data.csv"
 
 class SimpleDataHandler(BaseHTTPRequestHandler):
     """
@@ -29,38 +29,29 @@ class SimpleDataHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         #GETリクエストの処理
-        # 1. URLの解析
-        parsed_url = urlparse(self.path)
+        #1.URLの解析
+        parsed_url = urlparse(self.path) #urlをアドレスとクエリに分解
+        query_params_list = parse_qs(parsed_url.query)# parse_qsは値をリストとして返すため、辞書内包表記で最初の要素を取り出す
         
-        # 2. クエリパラメータの分解
-        # parse_qsは値をリストとして返すため、辞書内包表記で最初の要素を取り出す
-        query_params_list = parse_qs(parsed_url.query)
-        
-        # 3. データの抽出 (リストから単一の値を取り出す)
-        try:
+        #2.データの抽出 (リストから単一の値を取り出す)
+        try: #try...except...でエラーが起きた時の対策
             # クライアントコードで送られているキー名に合わせる
             time_value = query_params_list.get('time', ['N/A'])[0]
             id_value = query_params_list.get('ID', ['N/A'])[0] # 大文字'ID'
             lux_value = query_params_list.get('lux', ['N/A'])[0]
             sense_value = query_params_list.get('sense', ['N/A'])[0]
             
-            # 4. CSVファイルにデータを追記
+            #3.CSVファイルにデータを追記
             try:
-                is_new_file = not os.path.exists(CSV_FILE)
-                
-                with open(CSV_FILE, 'a', newline='', encoding='utf-8') as csvfile:
+                is_new_file = not os.path.exists(CSV_FILE) #存在しなければis_new_fileがtrueになる
+                with open(CSV_FILE, 'a', newline='', encoding='utf-8') as csvfile: #'a'は追記モード
                     writer = csv.writer(csvfile)
-                    
-                    # ファイルが新規作成された場合、ヘッダー行を書き込む
-                    if is_new_file:
+                    if is_new_file: #新規ファイルの場合
                         writer.writerow(['timestamp', 'device_id', 'lux_value', 'sense_value'])
-                    
-                    # 抽出したデータを書き込む
-                    writer.writerow([time_value, id_value, lux_value, sense_value])
-                    
+                    writer.writerow([time_value, id_value, lux_value, sense_value])#抽出したデータを書き込む
                 print(f"-> Data successfully saved to {CSV_FILE}")
                 
-                # 5. ログ出力 (コンソール)
+                # 4.出力ログを出力 (コンソール)
                 print(
                     f"\n========================================\n"
                     f"[{self.date_time_string()}] GET Data Received from {self.client_address[0]}\n"
@@ -72,7 +63,7 @@ class SimpleDataHandler(BaseHTTPRequestHandler):
                     f"========================================"
                 )
                 
-                # 6. クライアントへの応答
+                #5.クライアントへの応答
                 self._set_headers(200)
                 response = {"status": "OK", "message": "Data successfully received and logged to CSV."}
                 
