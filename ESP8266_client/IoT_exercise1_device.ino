@@ -5,17 +5,19 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <ESP8266HTTPClient.h> 
-const char* ssid = "ist_members"; //大学のwifi
-const char* password = "8gAp3nY!s2Gm";
-//const char* ssid = "pr500m-993bc7-1"; //自宅作業用
-//const char* password = "771326f70b313";
+//const char* ssid = "ist_members"; //大学のwifi
+//const char* password = "8gAp3nY!s2Gm";
+//const char* ssid = "bld2_guest"; //大学のwifi
+//const char* password = "MatsumotoWay";
+const char* ssid = "pr500m-993bc7-1"; //自宅作業用
+const char* password = "771326f70b313";
 const char* host = "iot.hongo.wide.ad.jp";
 const String ENDPOINT_PATH = "/receive_data";
-const int port = 10145; // ** 割り当てられたものを使用せよ**
+const int port = 10141; // ** 割り当てられたものを使用せよ**
 const char* ntp_server = "ntp.nict.jp";
 WiFiUDP udp; 
 
-WiFiClient client; //TCP通信用のクライアントオブジェクト
+//WiFiClient client; //TCP通信用のクライアントオブジェクト
 unsigned char seq = 0;
 
 #define SCREEN_WIDTH 128
@@ -57,7 +59,7 @@ void setup() {
   display.println(WiFi.localIP());
   display.display();
   Serial.println("done");//動作チェック
-  delay(5000);
+  //delay(5000);
   //つながらなかった場合の処理 未実装
 
   //3.時刻取得
@@ -78,6 +80,9 @@ void loop(){
   display.clearDisplay();
   display.setCursor(0,0);
   display.setTextColor(SSD1306_WHITE);
+  if(digitalRead(16)){
+    last_detection_time = millis();
+  }
 
   //4.1 ID,時刻,照度,人感センサを取得→ディスプレイに表示
   unsigned long time = getNTPTime(ntp_server);
@@ -88,7 +93,11 @@ void loop(){
   float i;
   display.println(i=getIlluminance());
   boolean m;
-  display.println(m=getMDSStatus());
+  if(millis()-last_detection_time < 3000){
+    m = true;
+  }
+  else{m = false;}
+  display.println(m);
   display.display();
   delay(3000);//3秒は表示
 
@@ -110,7 +119,7 @@ void loop(){
     display.display();
     sendData(t,d,i,m);
   }
-  delay(27000);
+  delay(7000);
 }
 
 
@@ -122,9 +131,10 @@ void sendData(String a,int b,float c,boolean d){
   //HTTPクライアントオブジェクトを宣言
   HTTPClient http;
   //1.urlを構築
-  String dataUrl = String(host)+ENDPOINT_PATH+"?time="+String(a)+"&ID="+String(b)+"&lux="+String(c)+"&sense="+String(d);
-
+  String dataUrl = "http://"+String(host)+":"+String(port)+ENDPOINT_PATH+"?time="+String(a)+"&ID="+String(b)+"&lux="+String(c)+"&sense="+String(d);
+  Serial.println(dataUrl);
   //2.HTTPリクエストを開始
+  WiFiClient client;
   http.begin(client,dataUrl);
 
   //3.getメッセージでリクエストを送信
@@ -138,7 +148,7 @@ void sendData(String a,int b,float c,boolean d){
 
 //人を感知するセンサ関数
 boolean getMDSStatus(){
-    return digitalRead(16);  
+    return digitalRead(16);
 }
 
 //照度を返す関数
